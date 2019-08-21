@@ -16,6 +16,9 @@ def main(configpath):
     input_dir = Path(options.get('input_file'))
     input_file = ','.join(list(map(str, input_dir.glob('**/all-maxseq{}.tfrecord'.format(max_sq_len)))))
     output_dir = options.get('output_dir')
+    output_dir = os.path.join(output_dir, max_sq_len)
+    if not(os.path.exists(output_dir)):
+        os.makedirs(output_dir)
     do_train = options.get('do_train')
     do_eval = options.get('do_eval')
     train_batch_size = options.get('train_batch_size')
