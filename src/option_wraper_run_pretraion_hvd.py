@@ -14,17 +14,17 @@ def main(configpath):
     options = config['BERT-OPTION']
     max_sq_len = options.get('max_sq_length')
     input_dir = Path(options.get('input_file'))
-    input_file = ','.join(list(map(str, input_dir.glob('**/all-maxseq{}.tfrecord'.format(max_sq_len)))))
-    # input_file = str(input_dir / "AE" / 'all-maxseq{}.tfrecord'.format(max_sq_len))
+    # input_file = ','.join(list(map(str, input_dir.glob('**/all-maxseq{}.tfrecord'.format(max_sq_len)))))
+    input_file = str(input_dir / "AE" / 'all-maxseq{}.tfrecord'.format(max_sq_len))
+
     output_dir = options.get('output_dir')
-    output_dir = os.path.join(output_dir, max_sq_len)
     if not(os.path.exists(output_dir)):
         os.makedirs(output_dir)
+
     do_train = options.get('do_train')
     do_eval = options.get('do_eval')
     train_batch_size = options.get('train_batch_size')
     max_pre_per_seq = options.get('max_predicitons_per_seq')
-    print(max_pre_per_seq)
     # max_pre_per_seq = 20
     num_train_steps = options.get('num_train_steps')
     num_warmup_steps = options.get('num_warmup_steps')
@@ -36,7 +36,9 @@ def main(configpath):
                                                            max_sq_len, max_pre_per_seq, num_train_steps,
                                                            num_warmup_steps, save_checkpoints_steps, learning_rate)
 
-    mycmd = 'python ' + os.path.join(CURDIR, 'run_pretraining.py') + " " + option
+    horovodoption = "-np 4 -H localhost:4"
+    mycmd = " ".join(['horovodrun', horovodoption, 'python ' + os.path.join(CURDIR, 'run_pretraining_hvd.py'), option])
+    print(mycmd)
     p = subprocess.Popen(mycmd, stdout = subprocess.PIPE, stderr = subprocess.STDOUT, shell=True)
     for line in iter(p.stdout.readline, b''):
         print(line.rstrip().decode("utf8"))
