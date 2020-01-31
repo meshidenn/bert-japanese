@@ -11,7 +11,6 @@
     "num_hidden_layers": 24,
     "num_hidden_groups": 1,
     "net_structure_type": 0,
-    "layers_to_keep": [],
     "gap_size": 0,
     "num_memory_blocks": 0,
     "inner_group_num": 1,
