@@ -36,7 +36,11 @@ def main(configpath):
                                                            max_sq_len, max_pre_per_seq, num_train_steps,
                                                            num_warmup_steps, save_checkpoints_steps, learning_rate)
 
-    mycmd = 'python ' + os.path.join(CURDIR, 'run_pretraining.py') + " " + option
+    if options.get_boolean("train_parallel"):
+        horovodoption = "-np 4 -H localhost:4"
+        mycmd = " ".join(['horovodrun', horovodoption, 'python ' + os.path.join(CURDIR, 'run_pretraining_hvd.py'), option])
+    else:
+        mycmd = 'python ' + os.path.join(CURDIR, 'run_pretraining.py') + " " + option
     p = subprocess.Popen(mycmd, stdout = subprocess.PIPE, stderr = subprocess.STDOUT, shell=True)
     for line in iter(p.stdout.readline, b''):
         print(line.rstrip().decode("utf8"))
